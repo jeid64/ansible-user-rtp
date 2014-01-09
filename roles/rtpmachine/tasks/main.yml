@@ -14,10 +14,10 @@
   local_action: command kadmin.local -q 'ank -randkey host/{{ inventory_hostname }}@CSH.RIT.EDU'  
 
 - name: Generate Kerberos host keytab
-  local_action: command kadmin.local -q 'ktadd -k /root/ansible-user/keytabs/{{ inventory_hostname }}.keytab host/{{ inventory_hostname }}' creates=/root/ansible-user/keytabs/{{ inventory_hostname }}.keytab 
+  local_action: command kadmin.local -q 'ktadd -k /root/ansible-user-rtp/keytabs/{{ inventory_hostname }}.keytab host/{{ inventory_hostname }}' creates=/root/ansible-user-rtp/keytabs/{{ inventory_hostname }}.keytab 
 
 - name: Copy the generated keytab to the host.
-  copy: owner=root group=root mode=600 src=/root/ansible-user/keytabs/{{ inventory_hostname }}.keytab dest=/etc/krb5.keytab 
+  copy: owner=root group=root mode=600 src=/root/ansible-user-rtp/keytabs/{{ inventory_hostname }}.keytab dest=/etc/krb5.keytab 
 
 - name: Copy over krb5.conf
   template: src=krb5.conf.j2 dest=/etc/krb5.conf
