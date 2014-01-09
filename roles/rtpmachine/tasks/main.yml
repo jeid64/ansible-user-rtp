@@ -54,3 +54,9 @@
 
 - name: Enable sudo for those in group RTP.
   template: src=rtp.j2 dest=/etc/sudoers.d/rtp
+
+- name: Create symlinks for two popular RTP shells, ZSH and Bash.
+  file: src=/bin/bash dest=/usr/bin/bash state=link
+
+- name: Create symlinks for two popular RTP shells, ZSH and Bash.
+  file: src=/bin/zsh dest=/usr/bin/zsh state=link
