@@ -1,0 +1,22 @@
+#!/bin/zsh
+emulate -L zsh
+setopt err_exit
+
+readonly LOCKFILE="/etc/.ldapcache.lock"
+readonly CCFILE="/tmp/krb5cc_65"
+
+if [[ -e "$LOCKFILE" ]]; then
+        printf "Lockfile %s already exists. This should not happen!" "$LOCKFILE" >&2
+        printf "RTPs, look at this! ERROR FAILURE BAD BAD BAD\n" >&2
+        exit 1
+fi
+
+function unlock {
+        /bin/rm -f "$LOCKFILE"
+}
+
+trap 'unlock' EXIT ZERR HUP INT QUIT TERM
+printf "" > "$LOCKFILE"
+
+/usr/bin/kinit -k -t /etc/krb5.keytab -c $CCFILE host/{{ inventory_hostname }}
+chown nslcd $CCFILE

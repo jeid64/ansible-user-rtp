@@ -1,0 +1,7 @@
+---
+# The main infiniband site deployment playbook
+
+- hosts: rtpmachine
+  roles:
+   - rtpmachine
+ 

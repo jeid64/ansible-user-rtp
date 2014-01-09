@@ -1,0 +1,56 @@
+---
+# Tasks for creating an RTP machine.
+- name: Install required LDAP/KRB packages
+  yum: pkg={{item}} state=installed
+  with_items:
+   - cyrus-sasl-gssapi
+   - pam_krb5
+   - krb5-workstation
+   - nss-pam-ldapd
+   - openldap-clients
+   - zsh
+
+- name: Generate Kerberos host principle
+  local_action: command kadmin.local -q 'ank -randkey host/{{ inventory_hostname }}@CSH.RIT.EDU'  
+
+- name: Generate Kerberos host keytab
+  local_action: command kadmin.local -q 'ktadd -k /root/ansible-user/keytabs/{{ inventory_hostname }}.keytab host/{{ inventory_hostname }}' creates=/root/ansible-user/keytabs/{{ inventory_hostname }}.keytab 
+
+- name: Copy the generated keytab to the host.
+  copy: owner=root group=root mode=600 src=/root/ansible-user/keytabs/{{ inventory_hostname }}.keytab dest=/etc/krb5.keytab 
+
+- name: Copy over krb5.conf
+  template: src=krb5.conf.j2 dest=/etc/krb5.conf
+
+- name: Copy over pam_ldap.conf
+  template: src=pam_ldap.conf.j2 dest=/etc/pam_ldap.conf
+
+- name: Copy over ldap.conf
+  template: src=ldap.conf.j2 dest=/etc/openldap/ldap.conf
+
+- name: Copy over nsswitch.conf
+  template: src=nsswitch.conf.j2 dest=/etc/nsswitch.conf
+
+- name: Copy over nslcd.conf
+  template: src=nslcd.conf.j2 dest=/etc/nslcd.conf
+
+- name: Copy over the script to create a kerberos CCFile and chown it to the nslcd user.
+  template: src=update_nssldap.j2 dest=/root/update_nssldap mode=0700
+
+- name: Add the script to root crontab.
+  cron: minute="*/30" job="/root/update_nssldap" name="update_nssldap"
+
+- name: Copy over PAM system-auth-ac file.
+  template: src=system-auth-ac.j2 dest=/etc/pam.d/system-auth-ac
+
+- name: Copy over PAM password-auth-ac file.
+  template: src=password-auth-ac.j2 dest=/etc/pam.d/password-auth-ac
+
+- name: Start the services for nslcd and nscd
+  service: name={{ item }} state=restarted enabled=yes
+  with_items:
+   - nslcd
+   - nscd
+
+- name: Enable sudo for those in group RTP.
+  template: src=rtp.j2 dest=/etc/sudoers.d/rtp

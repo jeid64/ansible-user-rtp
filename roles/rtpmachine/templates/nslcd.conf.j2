@@ -1,0 +1,14 @@
+uid nslcd
+#gid nslcd
+uri ldap://ldap.csh.rit.edu
+base dc=csh,dc=rit,dc=edu
+#binddn dc=csh,dc=rit,dc=edu
+bind_timelimit 3
+#krb5_ccname FILE:/tmp/ldapcache.key
+use_sasl on
+sasl_mech GSSAPI
+#ssl start_tls
+#tls_cacertdir /etc/openldap/cacerts
+#filter passwd (memberOf=cn=rtp,ou=Groups,dc=csh,dc=rit,dc=edu)
+map group uniqueMember member
+map passwd homeDirectory "/home/$uid"

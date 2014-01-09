@@ -1,0 +1,20 @@
+#
+# LDAP Defaults
+#
+
+# See ldap.conf(5) for details
+# This file should be world readable but not world writable.
+
+#BASE   dc=example,dc=com
+#URI    ldap://ldap.example.com ldap://ldap-master.example.com:666
+
+#SIZELIMIT      12
+#TIMELIMIT      15
+#DEREF          never
+BASE dc=csh,dc=rit,dc=edu
+URI ldap://ldap.csh.rit.edu
+
+pam_groupdn cn=member,ou=Groups,dc=csh,dc=rit,dc=edu
+TLS_CACERTDIR /etc/openldap/cacerts
+TLC_CACERT /etc/ssl/certs/csh-ca.pem
+TLS_REQCERT never
